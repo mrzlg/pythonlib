@@ -65,7 +65,7 @@ class MyDB:
         return result
 
     def update(self, sql):
-        print u'执行 UPDATE 及 DELETE 语句'
+        # print u'执行 UPDATE 及 DELETE 语句'
         try:
             self._cur.execute("SET NAMES utf8")
             result = self._cur.execute(sql)
@@ -77,7 +77,7 @@ class MyDB:
         return result
 
     def insert(self, sql):
-        print u'执行 INSERT 语句。如主键为自增长int，则返回新生成的ID'
+        # print u'执行 INSERT 语句。如主键为自增长int，则返回新生成的ID'
         try:
             self._cur.execute("SET NAMES utf8")
             self._cur.execute(sql)
@@ -88,27 +88,27 @@ class MyDB:
             return False
 
     def fetchAllRows(self):
-        print u'返回结果列表'
+        # print u'返回结果列表'
         return self._cur.fetchall()
 
     def fetchOneRow(self):
-        print u'返回一行结果，然后游标指向下一行。到达最后一行以后，返回None'
+        # print u'返回一行结果，然后游标指向下一行。到达最后一行以后，返回None'
         return self._cur.fetchone()
 
     def getRowCount(self):
-        print u'获取结果行数'
+        # print u'获取结果行数'
         return self._cur.rowcount
 
     def commit(self):
-        print u'数据库commit操作'
+        # print u'数据库commit操作'
         self._conn.commit()
 
     def rollback(self):
-        print u'数据库回滚操作'
+        # print u'数据库回滚操作'
         self._conn.rollback()
 
     def __del__(self):
-        print u'释放资源（系统GC自动调用）'
+        # print u'释放资源（系统GC自动调用）'
         try:
             self._cur.close()
             self._conn.close()
@@ -116,7 +116,7 @@ class MyDB:
             pass
 
     def close(self):
-        print u'关闭数据库连接'
+        # print u'关闭数据库连接'
         self.__del__()
 
 
