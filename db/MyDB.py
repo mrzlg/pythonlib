@@ -28,7 +28,7 @@ class MyDB:
     _timecount = 222
 
     def __init__(self, dbconfig):
-        u'构造器：根据数据库连接参数，创建MySQL连接'
+        # u'构造器：根据数据库连接参数，创建MySQL连接'
         try:
             self._conn = MySQLdb.connect(host=dbconfig['host'],
                                          port=dbconfig['port'],
@@ -54,7 +54,7 @@ class MyDB:
         self._instance = MySQLdb
 
     def query(self, sql):
-        print u'执行 SELECT 语句'
+        # print u'执行 SELECT 语句'
         try:
             self._cur.execute("SET NAMES utf8")
             result = self._cur.execute(sql)
@@ -85,6 +85,7 @@ class MyDB:
             return self._conn.insert_id()
         except MySQLdb.Error, e:
             self.error_code = e.args[0]
+            print self.error_code
             return False
 
     def fetchAllRows(self):
