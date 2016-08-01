@@ -81,7 +81,7 @@ def downloadItems():
     for item in items:
         folder = getFolder(item)
         if not os.path.exists(folder) or not os.path.isdir(folder):
-            os.mkdir(folder)
+            os.makedirs(folder)
         if not os.path.exists(folder + "/" + item):
             str = getHtml(baseUrl + item, 10)
             if str is not None:
