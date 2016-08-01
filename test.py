@@ -14,4 +14,5 @@ result = db.fetchAllRows( )
 
 # 相当于php里面的var_dump
 print result
+
 # db.close()
