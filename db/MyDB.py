@@ -18,35 +18,35 @@ import time
 class MyDB:
     u'''对MySQLdb常用函数进行封装的类'''
 
-    error_code = ''  # MySQL错误号码
-
-    _instance = None  # 本类的实例
-    _conn = None  # 数据库conn
-    _cur = None  # 游标
-
-    _TIMEOUT = 30  # 默认超时30秒
-    _timecount = 222
-
-    def __init__(self, dbconfig):
+    def __init__(self, cfg):
         # u'构造器：根据数据库连接参数，创建MySQL连接'
+        self.error_code = ''  # MySQL错误号码
+
+        self._instance = None  # 本类的实例
+        self._conn = None  # 数据库conn
+        self._cur = None  # 游标
+
+        self._TIMEOUT = 30  # 默认超时30秒
+        self._timeCount = 222
         try:
-            self._conn = MySQLdb.connect(host=dbconfig['host'],
-                                         port=dbconfig['port'],
-                                         user=dbconfig['user'],
-                                         passwd=dbconfig['passwd'],
-                                         db=dbconfig['db'],
-                                         charset=dbconfig['charset'])
+            self._conn = MySQLdb.connect(host=cfg['host'],
+                                         port=cfg['port'],
+                                         user=cfg['user'],
+                                         passwd=cfg['passwd'],
+                                         db=cfg['db'],
+                                         charset=cfg['charset'])
 
         except MySQLdb.Error, e:
             self.error_code = e.args[0]
             error_msg = 'MySQL error! ', e.args[0], e.args[1]
             print error_msg
             # 如果没有超过预设超时时间，则再次尝试连接，
-            if self._timecount < self._TIMEOUT:
+            if self._timeCount < self._TIMEOUT:
                 interval = 5
-                self._timecount += interval
+                self._timeCount += interval
                 time.sleep(interval)
-                return self.__init__(dbconfig)
+                self.__init__(cfg)
+                return
             else:
                 raise Exception(error_msg)
 
@@ -85,7 +85,7 @@ class MyDB:
             return self._conn.insert_id()
         except MySQLdb.Error, e:
             self.error_code = e.args[0]
-            print self.error_code
+            print 'error code: ' + self.error_code
             return False
 
     def fetchAllRows(self):
@@ -121,38 +121,38 @@ class MyDB:
         self.__del__()
 
 
-if __name__ == '__main__':
-    '''使用样例'''
-
-    # 数据库连接参数
-    dbconfig = {'host': 'localhost',
-                'port': 3306,
-                'user': 'dbuser',
-                'passwd': 'dbpassword',
-                'db': 'testdb',
-                'charset': 'utf8'}
-
-    # 连接数据库，创建这个类的实例
-    db = MyDB(dbconfig)
-
-    # 操作数据库
-    sql = "SELECT * FROM `sample_table`"
-    db.query(sql)
-
-    # 获取结果列表
-    result = db.fetchAllRows()
-
-    # 相当于php里面的var_dump
-    print result
-
-    # 对行进行循环
-    for row in result:
-        # 使用下标进行取值
-        # print row[0]
-
-        # 对列进行循环
-        for colum in row:
-            print colum
-
-    # 关闭数据库
-    db.close()
+# if __name__ == '__main__':
+#     '''使用样例'''
+#
+#     # 数据库连接参数
+#     dbconfig = {'host': 'localhost',
+#                 'port': 3306,
+#                 'user': 'dbuser',
+#                 'passwd': 'dbpassword',
+#                 'db': 'testdb',
+#                 'charset': 'utf8'}
+#
+#     # 连接数据库，创建这个类的实例
+#     db = MyDB(dbconfig)
+#
+#     # 操作数据库
+#     sql = "SELECT * FROM `sample_table`"
+#     db.query(sql)
+#
+#     # 获取结果列表
+#     result = db.fetchAllRows()
+#
+#     # 相当于php里面的var_dump
+#     print result
+#
+#     # 对行进行循环
+#     for row in result:
+#         # 使用下标进行取值
+#         # print row[0]
+#
+#         # 对列进行循环
+#         for colum in row:
+#             print colum
+#
+#     # 关闭数据库
+#     db.close()
