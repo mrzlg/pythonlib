@@ -101,7 +101,7 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         url = baseUrl + "reg.php?f=" + sys.argv[1] + "&f1=(.txt)"
     else:
-        url = baseUrl + "reg.php?f=*V1.0.46*&f1=(.txt)"
+        url = baseUrl + "reg.php?f=*V1.0.46*S3*&f1=(.txt)"
 
     # 加载日志列表
     html = getHtml(url)
