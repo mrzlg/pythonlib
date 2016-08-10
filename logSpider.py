@@ -99,16 +99,19 @@ def downloadOneItem(item):
     if len(items) > 0:
         item = items.pop()
         gevent.spawn(downloadOneItem, item).join()
+
+
 # 下载列表中的文件
 def downloadItems():
     # 下载日志
-    length = min(len(items),200)
+    length = min(len(items), 200)
     print u'并发%d个' % length
     temp = []
-    for i in range(length):
-        temp.append(gevent.spawn(downloadOneItem,items.pop()))
+    for i in xrange(length):
+        temp.append(gevent.spawn(downloadOneItem, items.pop()))
 
     gevent.joinall(temp)
+
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
@@ -130,9 +133,8 @@ if __name__ == "__main__":
         print u"共 %d 个" % len(items)
         retryItems = []
         for i in xrange(1, 4):
-            print u'第 %d 轮下载尝试' % i
             downloadItems()
-            print u'======================= %d (%d)========================' % (i,len(retryItems))
+            print u'======================= 第 %d 轮下载尝试 (%d)========================' % (i, len(retryItems))
             if len(retryItems) > 0:
                 items = retryItems
                 retryItems = []
