@@ -6,6 +6,8 @@ import sys
 import codecs
 import re
 import requests
+import gevent
+from gevent import monkey
 from PIL import Image
 from StringIO import StringIO
 
@@ -13,6 +15,7 @@ from StringIO import StringIO
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
+monkey.patch_all()
 
 baseUrl = 'http://50.22.62.66/tools/feedback/bug/'
 totalNum = 0
@@ -40,16 +43,16 @@ def saveFile(fileName, content):
 # 获取Html
 def getHtml(url, timeout=60):
     # print url
-    global html
-    html = None
+    result = None
     try:
         page = requests.get(url, timeout=timeout)
     except requests.exceptions.RequestException, e:
         print u'====>下载超时：' + url
+        result = None
     else:
-        html = page.content
+        result = page.content
 
-    return html
+    return result
 
 
 # 下载图片
@@ -74,27 +77,40 @@ def getFolder(url):
     return 'log/' + arr[1]
 
 
+def downloadOneItem(item):
+    global loadedNum
+    folder = getFolder(item)
+    if not os.path.exists(folder) or not os.path.isdir(folder):
+        os.makedirs(folder)
+    print u'----->开始下载(%d/%d)：%s' % (totalNum - len(items), totalNum, baseUrl + item)
+    if not os.path.exists(folder + "/" + item):
+        str = getHtml(baseUrl + item, 10)
+        if str is not None:
+            # print str
+            saveFile(folder + "/" + item, str)
+            loadedNum += 1
+            print u'下载成功(%d/%d)：%s' % (loadedNum, totalNum, baseUrl + item)
+        else:
+            print u'加入retryItems'
+            retryItems.append(item)
+    else:
+        loadedNum += 1
+        print u'已存在(%d/%d):%s' % (loadedNum, totalNum, baseUrl + item)
+    if len(items) > 0:
+        item = items.pop()
+        gevent.spawn(downloadOneItem, item).join()
+
+
 # 下载列表中的文件
 def downloadItems():
-    global loadedNum
     # 下载日志
-    for item in items:
-        folder = getFolder(item)
-        if not os.path.exists(folder) or not os.path.isdir(folder):
-            os.makedirs(folder)
-        if not os.path.exists(folder + "/" + item):
-            str = getHtml(baseUrl + item, 10)
-            if str is not None:
-                # print str
-                saveFile(folder + "/" + item, str)
-                loadedNum += 1
-                print u'下载成功(%d/%d)：%s' % (loadedNum, totalNum, baseUrl + item)
-            else:
-                print u'加入retryItems'
-                retryItems.append(item)
-        else:
-            loadedNum += 1
-            print u'已存在(%d/%d):%s' % (loadedNum, totalNum, baseUrl + item)
+    length = min(len(items), 200)
+    print u'并发%d个' % length
+    temp = []
+    for i in xrange(length):
+        temp.append(gevent.spawn(downloadOneItem, items.pop()))
+
+    gevent.joinall(temp)
 
 
 if __name__ == "__main__":
@@ -116,9 +132,9 @@ if __name__ == "__main__":
         totalNum = len(items)
         print u"共 %d 个" % len(items)
         retryItems = []
-        for i in xrange(1, 4):
-            print u'第 %d 轮下载尝试' % i
+        for i in xrange(1, 5):
             downloadItems()
+            print u'======================= 第 %d 轮下载尝试 (%d)========================' % (i, len(retryItems))
             if len(retryItems) > 0:
                 items = retryItems
                 retryItems = []
