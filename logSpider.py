@@ -104,7 +104,7 @@ def downloadOneItem(item):
 # 下载列表中的文件
 def downloadItems():
     # 下载日志
-    length = min(len(items), 200)
+    length = min(len(items), 50)
     print u'并发%d个' % length
     temp = []
     for i in xrange(length):
@@ -115,9 +115,9 @@ def downloadItems():
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
-        url = baseUrl + "reg.php?f=" + sys.argv[1] + "&f1=(.txt)"
+        url = baseUrl + "reg.php?f=" + sys.argv[1]
     else:
-        url = baseUrl + "reg.php?f=*V1.0.46*&f1=(.txt)"
+        url = baseUrl + "reg.php?f=*V1.0.46*"
 
     # 加载日志列表
     html = getHtml(url)
@@ -132,9 +132,9 @@ if __name__ == "__main__":
         totalNum = len(items)
         print u"共 %d 个" % len(items)
         retryItems = []
-        for i in xrange(1, 4):
+        for i in xrange(1, 10):
             downloadItems()
-            print u'======================= 第 %d 轮下载尝试 (%d)========================' % (i, len(retryItems))
+            print u'======================= 第 %d 轮下载尝试 (%d)========================' % (i + 1, len(retryItems))
             if len(retryItems) > 0:
                 items = retryItems
                 retryItems = []
